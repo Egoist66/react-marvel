@@ -13,7 +13,7 @@ class ErrorBoundary extends PureComponent<ErorBoundaryProps, any> {
     error: false,
   };
 
-  static getDerivedStateFromError(error: boolean) {
+  static getDerivedStateFromError() {
     return { isError: true };
   }
 
