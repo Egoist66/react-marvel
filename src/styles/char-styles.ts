@@ -7,7 +7,8 @@ export const charStyles = css`
     &__info {
       padding: 25px;
       box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.25);
-      position: relative;
+      position: sticky;
+      top: 15px;
       z-index: 5;
       background-color: #fff;
 
@@ -83,6 +84,7 @@ export const charStyles = css`
     &__content {
       margin-top: 50px;
       display: grid;
+      position: relative;
       grid-template-columns: 650px 425px;
       column-gap: 25px;
       align-items: start;

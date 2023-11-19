@@ -5,6 +5,7 @@ import CharInfo from "../charInfo/CharInfo";
 import decoration from '../../assets/images/vision.png';
 import styled from "styled-components";
 import {PureComponent} from "react";
+import ErrorBoundary from "../error-boundary/ErrorBoundary.tsx";
 
 
 const StyledApp = styled.div`
@@ -26,7 +27,6 @@ class App extends PureComponent<any, AppStateInterface> {
             selectedChar: id
         })
 
-        console.log(id)
     }
 
 
@@ -37,10 +37,19 @@ class App extends PureComponent<any, AppStateInterface> {
             <StyledApp className="app">
                 <AppHeader/>
                 <main>
-                    <RandomChar/>
+                    <ErrorBoundary>
+                        <RandomChar/>
+                    </ErrorBoundary>
                     <div className="char__content">
-                        <CharList onCharSelected={this.onCharSelected}/>
-                        <CharInfo charId={selectedChar}/>
+
+                        <ErrorBoundary>
+                            <CharList onCharSelected={this.onCharSelected}/>
+                        </ErrorBoundary>
+
+
+                        <ErrorBoundary>
+                            <CharInfo charId={selectedChar}/>
+                        </ErrorBoundary>
                     </div>
                     <img className="bg-decoration" src={decoration} alt="vision"/>
                 </main>

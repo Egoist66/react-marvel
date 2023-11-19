@@ -2,7 +2,7 @@ import styled from "styled-components";
 import {FC, PureComponent} from "react";
 import {m_service} from "../../services/mservice-api.ts";
 import Preloader from "../preloader/preloader.tsx";
-import ErrorBoundary from "../error-boundary/error-boundary.tsx";
+import ErrorBoundary from "../error-boundary/ErrorBoundary.tsx";
 
 
 const StyledCharList = styled.div`
@@ -13,6 +13,7 @@ const StyledCharList = styled.div`
 
 interface CharListState {
     error: boolean,
+    limit: number
     isLoading: boolean
     chars: CharItems[]
 }
@@ -26,16 +27,29 @@ export interface CharItems {
     wiki: string | undefined,
 }
 
-interface CharListProps  {
+interface CharListProps {
     onCharSelected: (id: number) => void
 }
+
 class CharList extends PureComponent<CharListProps, CharListState> {
+
 
     state: Readonly<CharListState> = {
         isLoading: true,
         error: false,
+        limit: 0,
         chars: []
     };
+
+    incrementLimit = () => {
+        this.setState((state) => (
+            {
+                ...state,
+                limit: state.limit + 3
+
+            }
+        ))
+    }
 
     onError = () => {
         this.setState({
@@ -68,6 +82,31 @@ class CharList extends PureComponent<CharListProps, CharListState> {
     componentDidMount(): void {
         this.loadChars();
 
+    }
+
+    componentDidUpdate(_: Readonly<CharListProps>, prevState: Readonly<CharListState>) {
+        if (prevState.limit !== this.state.limit) {
+            this.setState({
+                ...this.state,
+                isLoading: true
+            })
+            m_service.getAllCharacters(this.state.limit)
+                .then(chars => {
+                    this.setState({
+                        ...this.state,
+                        isLoading: false,
+                        chars: [...chars]
+                    })
+                })
+                .catch((e) => {
+                    this.setState({
+                        ...this.state,
+                        isLoading: false,
+                        error: true
+                    })
+                    console.log(e)
+                })
+        }
     }
 
     mappedChars = () => {
@@ -106,8 +145,8 @@ class CharList extends PureComponent<CharListProps, CharListState> {
                             <ul className="char__grid">
                                 {this.mappedChars()}
                             </ul>
-                            <button className="button button__main button__long">
-                                <div className="inner">load more</div>
+                            <button onClick={this.incrementLimit} className="button button__main button__long">
+                                <p className="inner">{this.state.isLoading ? 'Loading...' : 'Load more'}</p>
                             </button>
 
                         </>
@@ -127,7 +166,7 @@ type CharListItemProps = {
     alt: string
     id: number
     name: string
-    onCharListSelect: (id:number) => void
+    onCharListSelect: (id: number) => void
 }
 const CharListItem: FC<CharListItemProps> = ({name, onCharListSelect, src, id, alt}) => {
     return (

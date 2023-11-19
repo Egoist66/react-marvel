@@ -4,7 +4,7 @@ import {FC, PureComponent, ReactNode} from "react";
 import {m_service} from "../../services/mservice-api";
 import {randomId} from "../../utils/randomId";
 import Preloader from "../preloader/preloader";
-import ErrorBoundary from "../error-boundary/error-boundary";
+import ErrorBoundary from "../error-boundary/ErrorBoundary.tsx";
 import { Comics } from "../../app-types/types";
 import { drawCharThubmnail } from "../../utils/check-thumbnail";
 
@@ -72,7 +72,8 @@ class RandomChar extends PureComponent<any, RandomCharState> {
     }
 
     render(): ReactNode {
-        console.log('render')
+
+
         const {isLoading, char, error} = this.state;
 
         return (

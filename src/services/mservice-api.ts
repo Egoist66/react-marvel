@@ -4,8 +4,9 @@ import { MDataService } from "./mdata-service.ts";
 
 class MService extends MDataService {
 
-    private _apiBase = 'https://gateway.marvel.com:443/v1/public/'
-    private _apiKey = 'apikey=86cdbb80c53d57e047d3f5960d6b0596'
+    private _apiBase: string = 'https://gateway.marvel.com:443/v1/public/'
+    private _apiKey: string = 'apikey=86cdbb80c53d57e047d3f5960d6b0596'
+    private _limitCount: number = 9
 
 
     private async getResource(url: string, format: 'text' | 'json') {
@@ -19,8 +20,8 @@ class MService extends MDataService {
         
     }
 
-    async getAllCharacters() {
-        const chars : DataRootCharacters = await this.getResource(`${this._apiBase}characters?limit=9&offset=210&${this._apiKey}`, 'json')
+    async getAllCharacters(count: number = 0) {
+        const chars : DataRootCharacters = await this.getResource(`${this._apiBase}characters?limit=${this._limitCount + count}&offset=210&${this._apiKey}`, 'json')
         const {data: {results}} = chars
     
 
