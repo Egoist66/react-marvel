@@ -13,8 +13,9 @@ const StyledCharList = styled.div`
 
 interface CharListState {
     error: boolean,
-    limit: number
+    offset: number
     isLoading: boolean
+    isPaginating: boolean
     chars: CharItems[]
 }
 
@@ -36,19 +37,21 @@ class CharList extends PureComponent<CharListProps, CharListState> {
 
     state: Readonly<CharListState> = {
         isLoading: true,
+        isPaginating: false,
         error: false,
-        limit: 0,
+        offset: 210,
         chars: []
     };
 
-    incrementLimit = () => {
-        this.setState((state) => (
-            {
-                ...state,
-                limit: state.limit + 3
+    incrementLimit = (count: number) => {
+        return () => {
+            this.setState((state) => (
+                {
+                    offset: state.offset + count
 
-            }
-        ))
+                }
+            ))
+        }
     }
 
     onError = () => {
@@ -71,6 +74,33 @@ class CharList extends PureComponent<CharListProps, CharListState> {
 
     };
 
+    paginateChars = () => {
+        this.setState({
+            ...this.state,
+            isPaginating: true
+        })
+
+        m_service.getAllCharacters(this.state.offset, 210, 9)
+            .then(newchars => {
+                this.setState(({chars}) => ({
+                    chars: [...chars, ...newchars]
+                }))
+            })
+            .catch((e) => {
+                this.setState({
+                    ...this.state,
+                    error: true
+                })
+                console.log(e)
+            })
+            .finally(() => {
+                this.setState({
+                    isLoading: false,
+                    isPaginating: false,
+                })
+            })
+    }
+
     onCharLoaded = (chars: CharItems[]) => {
         this.setState({
             chars,
@@ -85,27 +115,8 @@ class CharList extends PureComponent<CharListProps, CharListState> {
     }
 
     componentDidUpdate(_: Readonly<CharListProps>, prevState: Readonly<CharListState>) {
-        if (prevState.limit !== this.state.limit) {
-            this.setState({
-                ...this.state,
-                isLoading: true
-            })
-            m_service.getAllCharacters(this.state.limit)
-                .then(chars => {
-                    this.setState({
-                        ...this.state,
-                        isLoading: false,
-                        chars: [...chars]
-                    })
-                })
-                .catch((e) => {
-                    this.setState({
-                        ...this.state,
-                        isLoading: false,
-                        error: true
-                    })
-                    console.log(e)
-                })
+        if (prevState.offset !== this.state.offset) {
+            this.paginateChars()
         }
     }
 
@@ -113,7 +124,7 @@ class CharList extends PureComponent<CharListProps, CharListState> {
         const {chars} = this.state
         const {onCharSelected} = this.props
 
-        return chars.map(char => {
+        return chars.length ? chars.map(char => {
             return (
                 <CharListItem
                     onCharListSelect={onCharSelected}
@@ -124,11 +135,11 @@ class CharList extends PureComponent<CharListProps, CharListState> {
                     key={char.id}
                 />
             )
-        })
+        }) : <h2>No characters were found!</h2>
     }
 
     render() {
-        const {error, isLoading} = this.state
+        const {error, isLoading, isPaginating, offset} = this.state
         return (
             <StyledCharList style={isLoading ? {
                 display: 'flex',
@@ -145,8 +156,9 @@ class CharList extends PureComponent<CharListProps, CharListState> {
                             <ul className="char__grid">
                                 {this.mappedChars()}
                             </ul>
-                            <button onClick={this.incrementLimit} className="button button__main button__long">
-                                <p className="inner">{this.state.isLoading ? 'Loading...' : 'Load more'}</p>
+                            <button style={{display: offset >= 1563 ? 'none' : 'block'}} disabled={isPaginating} onClick={this.incrementLimit(9)}
+                                    className="button button__main button__long">
+                                    <p className="inner">{isPaginating ? 'Loading...' : 'Load more'}</p>
                             </button>
 
                         </>

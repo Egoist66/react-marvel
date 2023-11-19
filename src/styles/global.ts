@@ -105,7 +105,7 @@ export const GlobalStyles = createGlobalStyle`
     cursor: pointer;
     &__long {
       display: block;
-      width: 170px;
+      width: 200px;
       margin: 45px auto 0 auto;
     }
     .inner {
