@@ -1,6 +1,6 @@
 import styled from "styled-components";
-import {FC, PureComponent} from "react";
-import {m_service} from "../../services/mservice-api.ts";
+import { FC, PureComponent, createRef } from "react";
+import { m_service } from "../../services/mservice-api.ts";
 import Preloader from "../preloader/preloader.tsx";
 import ErrorBoundary from "../error-boundary/ErrorBoundary.tsx";
 
@@ -30,6 +30,7 @@ export interface CharItems {
 
 interface CharListProps {
     onCharSelected: (id: number) => void
+    selectedChar: number | null
 }
 
 class CharList extends PureComponent<CharListProps, CharListState> {
@@ -80,9 +81,9 @@ class CharList extends PureComponent<CharListProps, CharListState> {
             isPaginating: true
         })
 
-        m_service.getAllCharacters(this.state.offset, 210, 9)
+        m_service.getAllCharacters(this.state.offset)
             .then(newchars => {
-                this.setState(({chars}) => ({
+                this.setState(({ chars }) => ({
                     chars: [...chars, ...newchars]
                 }))
             })
@@ -121,14 +122,15 @@ class CharList extends PureComponent<CharListProps, CharListState> {
     }
 
     mappedChars = () => {
-        const {chars} = this.state
-        const {onCharSelected} = this.props
+        const { chars } = this.state
+        const { onCharSelected, selectedChar } = this.props
 
         return chars.length ? chars.map(char => {
             return (
                 <CharListItem
                     onCharListSelect={onCharSelected}
                     id={char.id}
+                    selectedChar={selectedChar}
                     src={char.thumbnail}
                     alt={char.name}
                     name={char.name}
@@ -139,14 +141,15 @@ class CharList extends PureComponent<CharListProps, CharListState> {
     }
 
     render() {
-        const {error, isLoading, isPaginating, offset} = this.state
+        
+        const { error, isLoading, isPaginating, offset } = this.state
         return (
             <StyledCharList style={isLoading ? {
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
                 height: '50%',
-            } : {display: 'block'}} className={'char__list'}>
+            } : { display: 'block' }} className={'char__list'}>
 
                 <ErrorBoundary error={error} onTryhandler={this.loadChars}>
 
@@ -156,14 +159,17 @@ class CharList extends PureComponent<CharListProps, CharListState> {
                             <ul className="char__grid">
                                 {this.mappedChars()}
                             </ul>
-                            <button style={{display: offset >= 1563 ? 'none' : 'block'}} disabled={isPaginating} onClick={this.incrementLimit(9)}
-                                    className="button button__main button__long">
-                                    <p className="inner">{isPaginating ? 'Loading...' : 'Load more'}</p>
+                            <button style={{ display: offset >= 1563 ? 'none' : 'block' }}
+                                disabled={isPaginating}
+                                onClick={this.incrementLimit(9)}
+                                className="button button__main button__long">
+
+                                <p className="inner">{isPaginating ? 'Loading...' : 'Load more'}</p>
                             </button>
 
                         </>
 
-                    )}/>
+                    )} />
 
                 </ErrorBoundary>
 
@@ -177,15 +183,19 @@ type CharListItemProps = {
     src: string
     alt: string
     id: number
+    selectedChar: number | null
     name: string
     onCharListSelect: (id: number) => void
 }
-const CharListItem: FC<CharListItemProps> = ({name, onCharListSelect, src, id, alt}) => {
+const CharListItem: FC<CharListItemProps> = ({ name, selectedChar, onCharListSelect, src, id, alt }) => {
+
+
+   
     return (
 
-        <li onClick={() => onCharListSelect(id)}
-            style={{overflow: 'hidden'}}
-            className="char__item">
+        <li onFocus={() => onCharListSelect(id)} tabIndex={1} onClick={() => onCharListSelect(id)}
+            style={{ overflow: 'hidden' }}
+            className={selectedChar === id ? 'char__item_selected char__item' : 'char__item'}>
             <img
                 style={{
                     width: src?.endsWith('image_not_available.jpg') ? 230 : 200

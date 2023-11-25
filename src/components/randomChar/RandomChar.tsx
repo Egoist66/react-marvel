@@ -72,7 +72,7 @@ class RandomChar extends PureComponent<any, RandomCharState> {
     }
 
     render(): ReactNode {
-
+            
 
         const {isLoading, char, error} = this.state;
 

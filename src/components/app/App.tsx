@@ -43,7 +43,11 @@ class App extends PureComponent<any, AppStateInterface> {
                     <div className="char__content">
 
                         <ErrorBoundary>
-                            <CharList onCharSelected={this.onCharSelected}/>
+                            <CharList 
+                                selectedChar={this.state.selectedChar}
+                                onCharSelected={this.onCharSelected}
+                            
+                            />
                         </ErrorBoundary>
 
 

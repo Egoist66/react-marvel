@@ -113,6 +113,9 @@ export const charStyles = css`
         box-shadow: 0 5px 20px  ${props => props.theme.colors.main};
         transform: translateY(-8px);
       }
+      &:focus {
+        outline: none;
+      }
     }
     &__name {
       font-weight: bold;
