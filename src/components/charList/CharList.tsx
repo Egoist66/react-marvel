@@ -189,8 +189,6 @@ type CharListItemProps = {
 }
 const CharListItem: FC<CharListItemProps> = ({ name, selectedChar, onCharListSelect, src, id, alt }) => {
 
-
-   
     return (
 
         <li onFocus={() => onCharListSelect(id)} tabIndex={1} onClick={() => onCharListSelect(id)}
